@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# COULEURS
+GREEN="\e[32m"
+RED="\e[31m"
+YELLOW="\e[33m"
+NC="\e[0m"
+
+# VÉRIFICATION ROOT
+if [[ $EUID -ne 0 ]]; then
+    echo "Utilisez sudo pour exécuter ce script"
+    exit 1
+fi
+
+# INSTALLATION DES DÉPENDANCES
+debconf-set-selections <<< "postfix postfix/mailname string your.hostname.com"
+debconf-set-selections <<< "postfix postfix/main_mailer_type string 'Internet Site'"
+apt-get install --assume-yes postfix mailutils libnotify-bin
+
+sudo systemctl restart postfix 
+echo -e "$GREEN[INFO]$NC Dépendances installées"
