@@ -1,3 +1,39 @@
 #!/bin/bash
 
+# Phase de parsing
+tail -f -n 0 /var/log/auth.log | while read line; do
 
+  if [[ "$line" == *"sshd"* ]]; then
+    
+    # Différents cas  
+    case "$line" in
+        *"Accepted password"*|*"Accepted publickey"*)
+	    notify-send "✅ Connexion SSH réussie" "$base_info\nÉtat: Authentification réussie"
+            ;;
+        *"Failed password"*)
+            notify-send "❌ Échec d'authentification SSH" "$base_info\nÉtat: Mot de passe incorrect" 
+            ;;
+        *"Invalid user"*)
+            notify-send "⚠️ Tentative avec utilisateur invalide" "$base_info\nÉtat: Utilisateur inexistant"
+            ;;
+        *"Connection closed"*|*"Disconnected"*)
+            notify-send "🔌 Déconnexion SSH" "$base_info\nÉtat: Connexion fermée"
+            ;;
+        *"Did not receive identification string"*)
+            notify-send "🚫 Connexion SSH abandonnée" "$base_info\nÉtat: Identification échouée"
+            ;;
+        *"Connection from"*"closed"*)
+            notify-send "🔒 Connexion SSH fermée" "$base_info\nÉtat: Connexion interrompue"
+            ;;
+        *"maximum authentication attempts"*)
+            notify-send "🚨 Trop de tentatives d'authentification" "$base_info\nÉtat: Limite d'essais atteinte"
+            ;;
+        *"Received disconnect"*)
+            notify-send "📡 Déconnexion SSH" "$base_info\nÉtat: Client déconnecté"
+            ;;
+        *"pam_unix(sshd:auth): authentication failure"*)
+            notify-send "🔐 Échec d'authentification PAM" "$base_info\nÉtat: Authentification PAM échouée"
+            ;;
+    esac
+  fi
+done
