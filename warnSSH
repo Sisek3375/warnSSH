@@ -1,5 +1,17 @@
 #!/bin/bash
 
+notify-send "⚡ warnSSH est activé !"
+
+echo "warnSSH est activé, faites Ctrl+C pour arrêter le scan du port SSH"
+
+# Phase d'éxtraction
+extract_info() {
+  line=$1
+
+  user=$(echo $line | grep -oP '(for | user | ruser=)')
+
+}
+
 # Phase de parsing
 tail -f -n 0 /var/log/auth.log | while read line; do
 
@@ -8,9 +20,11 @@ tail -f -n 0 /var/log/auth.log | while read line; do
     # Différents cas  
     case "$line" in
         *"Accepted password"*|*"Accepted publickey"*)
-	    notify-send "✅ Connexion SSH réussie" "$base_info\nÉtat: Authentification réussie"
+		user=$(echo $line | grep -oP 'for \K\w+')
+	    notify-send "✅ Connexion SSH réussie" "$base_info\nÉtat: Authentification réussie avec $user"
             ;;
         *"Failed password"*)
+	
             notify-send "❌ Échec d'authentification SSH" "$base_info\nÉtat: Mot de passe incorrect" 
             ;;
         *"Invalid user"*)
