@@ -1,5 +1,10 @@
 [Unit]
+Description=Un outil pour notifier les connexions SSH en temps réel
 
 [Service]
+ExecStart=/usr/local/bin/warnSSH
+Restart=always
+User=root
 
 [Install]
+WantedBy=multi-user.target

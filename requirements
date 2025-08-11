@@ -17,5 +17,10 @@ debconf-set-selections <<< "postfix postfix/mailname string your.hostname.com"
 debconf-set-selections <<< "postfix postfix/main_mailer_type string 'Internet Site'"
 apt-get install --assume-yes postfix mailutils libnotify-bin > /dev/null
 
-sudo systemctl restart postfix 
-echo -e "$GREEN[INFO]$NC Dépendances installées"
+sudo systemctl restart postfix
+
+sudo cp warnSSH "/usr/local/bin/warnSSH"
+sudo cp warnssh.service /etc/systemd/system/warnssh.service
+systemctl daemon-reload
+systemctl start warnssh.service
+echo -e "$GREEN[INFO]$NC Installation terminée"
