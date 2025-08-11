@@ -22,5 +22,6 @@ sudo systemctl restart postfix
 sudo cp warnSSH "/usr/local/bin/warnSSH"
 sudo cp warnssh.service /etc/systemd/system/warnssh.service
 systemctl daemon-reload
-systemctl start warnssh.service
+systemctl enable warnssh.service
+systemctl restart warnssh.service
 echo -e "$GREEN[INFO]$NC Installation terminée"
