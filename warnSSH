@@ -1,53 +1,83 @@
 #!/bin/bash
-
 notify-send "⚡ warnSSH est activé !"
-
 echo "warnSSH est activé, faites Ctrl+C pour arrêter le scan du port SSH"
 
-# Phase d'éxtraction
+log_file="$HOME/warnssh.log"
+touch $log_file
+
+# Phase d'extraction
 extract_info() {
-  line=$1
-
-  user=$(echo $line | grep -oP '(for | user | ruser=)')
-
+  
+  # Extraction de la date et heure
+  datetime=$(echo "$line" | grep -oP '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}')
+  
+  # Extraction de l'utilisateur
+  if [[ "$line" == *"for "* ]]; then
+    user=$(echo "$line" | grep -oP 'for \K\w+')
+  elif [[ "$line" == *"user "* ]]; then
+    user=$(echo "$line" | grep -oP 'user \K[^(]+' | tr -d ' ')
+  elif [[ "$line" == *"ruser="* ]]; then
+    user=$(echo "$line" | grep -oP 'ruser=\K[^ ]+')
+  fi
+  
+  # Extraction de l'IP
+  if [[ "$line" == *"from "* ]]; then
+    ip=$(echo "$line" | grep -oP 'from \K[0-9.]+')
+  elif [[ "$line" == *"rhost="* ]]; then
+    ip=$(echo "$line" | grep -oP 'rhost=\K[^ ]+')
+  fi
+ 
+  # Formatage de la date
+  if [[ -n "$datetime" ]]; then
+    formatted_date=$(date -d "$datetime" "+%d/%m/%Y %H:%M:%S")
+  else
+    formatted_date="Date inconnue"
+  fi
+  
+  # Construction de base_info
+  base_info="🕒 $formatted_date"
+  [[ -n "$ip" ]] && base_info="$base_info\n🌐 IP: $ip"
+  [[ -n "$user" ]] && base_info="$base_info\n👤 User: $user"
+  
+  echo "$base_info"
 }
 
 # Phase de parsing
 tail -f -n 0 /var/log/auth.log | while read line; do
-
   if [[ "$line" == *"sshd"* ]]; then
+    # Extraction des informations communes
+    base_info=$(extract_info "$line")
     
-    # Différents cas  
+    # Switch case
     case "$line" in
         *"Accepted password"*|*"Accepted publickey"*)
-		user=$(echo $line | grep -oP 'for \K\w+')
-	    notify-send "✅ Connexion SSH réussie" "$base_info\nÉtat: Authentification réussie avec $user"
+            notify-send "✅ Connexion SSH réussie" "$base_info\n📋 Statut: Authentification réussie"
+            echo "$(date "+%d/%m/%Y %H:%M:%S") | Connexion SSH réussie" >> $log_file
             ;;
         *"Failed password"*)
-	
-            notify-send "❌ Échec d'authentification SSH" "$base_info\nÉtat: Mot de passe incorrect" 
+            notify-send "❌ Échec d'authentification SSH" "$base_info\n📋 Statut: Mot de passe incorrect" 
+            echo "$(date "+%d/%m/%Y %H:%M:%S") | Échec d'authentification SSH" >> $log_file
             ;;
         *"Invalid user"*)
-            notify-send "⚠️ Tentative avec utilisateur invalide" "$base_info\nÉtat: Utilisateur inexistant"
-            ;;
-        *"Connection closed"*|*"Disconnected"*)
-            notify-send "🔌 Déconnexion SSH" "$base_info\nÉtat: Connexion fermée"
-            ;;
+            notify-send "⚠️ Tentative avec utilisateur invalide" "$base_info\n📋 Statut: Utilisateur inexistant"
+            echo "$(date "+%d/%m/%Y %H:%M:%S") | Tentative avec utilisateur invalide" >> $log_file
+	    ;;
         *"Did not receive identification string"*)
-            notify-send "🚫 Connexion SSH abandonnée" "$base_info\nÉtat: Identification échouée"
-            ;;
+            notify-send "🚫 Connexion SSH abandonnée" "$base_info\n📋 Statut: Identification échouée"
+            echo "$(date "+%d/%m/%Y %H:%M:%S") | Connexion SSH abandonnée" >> $log_file
+	    ;;
         *"Connection from"*"closed"*)
-            notify-send "🔒 Connexion SSH fermée" "$base_info\nÉtat: Connexion interrompue"
-            ;;
-        *"maximum authentication attempts"*)
-            notify-send "🚨 Trop de tentatives d'authentification" "$base_info\nÉtat: Limite d'essais atteinte"
+            notify-send "🔒 Connexion SSH fermée" "$base_info\n📋 Statut: Connexion interrompue"
+            echo "$(date "+%d/%m/%Y %H:%M:%S") | Connexion SSH fermée" >> $log_file
             ;;
         *"Received disconnect"*)
-            notify-send "📡 Déconnexion SSH" "$base_info\nÉtat: Client déconnecté"
-            ;;
+            notify-send "📡 Déconnexion SSH" "$base_info\n📋 Statut: Client déconnecté"
+            echo "$(date "+%d/%m/%Y %H:%M:%S") | Déconnexion SSH" >> $log_file
+	    ;;
         *"pam_unix(sshd:auth): authentication failure"*)
-            notify-send "🔐 Échec d'authentification PAM" "$base_info\nÉtat: Authentification PAM échouée"
-            ;;
+            notify-send "🔐 Échec d'authentification PAM" "$base_info\n📋 Statut: Authentification PAM échouée"
+            echo "$(date "+%d/%m/%Y %H:%M:%S") | Échec d'authentification PAM" >> $log_file
+	    ;;
     esac
   fi
 done
