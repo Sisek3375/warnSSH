@@ -40,5 +40,6 @@ Environment=XAUTHORITY=/home/$user/.Xauthority
 WantedBy=multi-user.target
 EOF
 systemctl daemon-reload
-systemctl start warnssh.service
+systemctl enable warnssh.service
+systemctl restart warnssh.service
 echo -e "$GREEN[INFO]$NC Installation terminée"
