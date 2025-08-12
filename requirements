@@ -11,6 +11,12 @@ if [[ $EUID -ne 0 ]]; then
     echo "Utilisez sudo pour exécuter ce script"
     exit 1
 fi
+user=$(logname)
+read -p "entrez votre adresse mail : " email
+echo "export email=$email" >> /home/$user/.warnssh_env
+
+echo "entrez votre mot de passe d'application (16 caractères) : "
+read -s password
 
 # INSTALLATION DES DÉPENDANCES
 debconf-set-selections <<< "postfix postfix/mailname string your.hostname.com"
@@ -39,7 +45,18 @@ Environment=XAUTHORITY=/home/$user/.Xauthority
 [Install]
 WantedBy=multi-user.target
 EOF
+
+echo "[smtp.gmail.com]:587 $email:$password" > /etc/postfix/sasl/sasl_passwd
+chmod 600 /etc/postfix/sasl/sasl_passwd
+
+echo "relayhost = [smtp.gmail.com]:587" >> /etc/postfix/main.cf
+echo "smtp_use_tls = yes" >> /etc/postfix/main.cf
+echo "smtp_sasl_password_maps = hash:/etc/postfix/sasl/sasl_passwd" >> /etc/postfix/main.cf
+echo "smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt" >> /etc/postfix/main.cf
+
+postmap /etc/postfix/sasl/sasl_passwd
+
 systemctl daemon-reload
 systemctl enable warnssh.service
 systemctl restart warnssh.service
-echo -e "$GREEN[INFO]$NC Installation terminée"
+echo -e "$GREEN[INFO]$NC Installation terminée, veuillez relancer votre shell."
