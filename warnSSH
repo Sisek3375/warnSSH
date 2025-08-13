@@ -57,37 +57,37 @@ tail -f -n 0 /var/log/auth.log | while read line; do
         *"Accepted password"*|*"Accepted publickey"*)
             notify-send "✅ Connexion SSH réussie" "$base_info\n📋 Statut: Authentification réussie"
             echo "$(date "+%d/%m/%Y %H:%M:%S") | Connexion SSH réussie" >> $log_file
-            echo "Connexion SSH réussie avec ces informations :\n$base_info" | mail -s "WarnSSH - Connexion réussie ! ✅" $email
+            echo -e "Connexion SSH réussie avec ces informations :\n$base_info" | mail -s "WarnSSH - Connexion réussie ! ✅" $email
 	    ;;
         *"Failed password"*)
             notify-send "❌ Échec d'authentification SSH" "$base_info\n📋 Statut: Mot de passe incorrect" 
             echo "$(date "+%d/%m/%Y %H:%M:%S") | Échec d'authentification SSH" >> $log_file
-            echo "Connexion SSH échouée, le mot de passe est incorrect.\nVoici ces informations :\n$base_info" | mail -s "WarnSSH - Échec d'authentification SSH ❌" $email
+            echo -e "Connexion SSH échouée, le mot de passe est incorrect.\nVoici ces informations :\n$base_info" | mail -s "WarnSSH - Échec d'authentification SSH ❌" $email
             ;;
         *"Invalid user"*)
             notify-send "⚠️ Tentative avec utilisateur invalide" "$base_info\n📋 Statut: Utilisateur inexistant"
             echo "$(date "+%d/%m/%Y %H:%M:%S") | Tentative avec utilisateur invalide" >> $log_file
-            echo "Tentative avec un nom d'utilisateur invalide. Voici ces informations :\n$base_info" | mail -s "WarnSSH - Tentative avec utilisateur invalide ⚠️ " $email
+            echo -e "Tentative avec un nom d'utilisateur invalide. Voici ces informations :\n$base_info" | mail -s "WarnSSH - Tentative avec utilisateur invalide ⚠️ " $email
 	    ;;
         *"Did not receive identification string"*)
             notify-send "🚫 Connexion SSH abandonnée" "$base_info\n📋 Statut: Identification échouée"
             echo "$(date "+%d/%m/%Y %H:%M:%S") | Connexion SSH abandonnée" >> $log_file
-            echo "Une connexion SSH a été abandonnée. Voici ces informations :\n$base_info" | mail -s "WarnSSH - Connexion SSH abandonnée 🚫" $email
+            echo -e "Une connexion SSH a été abandonnée. Voici ces informations :\n$base_info" | mail -s "WarnSSH - Connexion SSH abandonnée 🚫" $email
 	    ;;
         *"Connection from"*"closed"*)
             notify-send "🔒 Connexion SSH fermée" "$base_info\n📋 Statut: Connexion interrompue"
             echo "$(date "+%d/%m/%Y %H:%M:%S") | Connexion SSH fermée" >> $log_file
-            echo "La connexion SSH a été fermée. Voici ces informations :\n$base_info" | mail -s "WarnSSH - Connexion SSH fermée 🔒" $email
+            echo -e "La connexion SSH a été fermée. Voici ces informations :\n$base_info" | mail -s "WarnSSH - Connexion SSH fermée 🔒" $email
             ;;
         *"Received disconnect"*)
             notify-send "📡 Déconnexion SSH" "$base_info\n📋 Statut: Client déconnecté"
             echo "$(date "+%d/%m/%Y %H:%M:%S") | Déconnexion SSH" >> $log_file
-            echo "Une déconnexion SSH a été détéctée. Voici ces informations :\n$base_info" | mail -s "WarnSSH - Déconnexion SSH détéctée 🔒" $email
+            echo -e "Une déconnexion SSH a été détéctée. Voici ces informations :\n$base_info" | mail -s "WarnSSH - Déconnexion SSH détéctée 🔒" $email
 	    ;;
         *"pam_unix(sshd:auth): authentication failure"*)
             notify-send "🔐 Échec d'authentification PAM" "$base_info\n📋 Statut: Authentification PAM échouée"
             echo "$(date "+%d/%m/%Y %H:%M:%S") | Échec d'authentification PAM" >> $log_file
-            echo "Échec d'authentification PAM. Voici ces informations :\n$base_info" | mail -s "WarnSSH - Échec d'authentification PAM 🔐" $email
+            echo -e "Échec d'authentification PAM. Voici ces informations :\n$base_info" | mail -s "WarnSSH - Échec d'authentification PAM 🔐" $email
 	    ;;
     esac
   fi
