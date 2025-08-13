@@ -48,6 +48,7 @@ EOF
 echo "[smtp.gmail.com]:587 $email:$password" > /etc/postfix/sasl_passwd
 chmod 600 /etc/postfix/sasl_passwd
 
+sed -i 41d /etc/postfix/main.cf
 echo "relayhost = [smtp.gmail.com]:587" >> /etc/postfix/main.cf
 echo "smtp_use_tls = yes" >> /etc/postfix/main.cf
 echo "smtp_sasl_auth_enable = yes" >> /etc/postfix/main.cf
