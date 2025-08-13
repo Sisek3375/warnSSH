@@ -15,7 +15,8 @@ user=$(logname)
 read -p "entrez votre adresse mail : " email
 echo "export email=$email" >> /home/$user/.warnssh_env
 
-read -s -p "entrez votre mot de passe d'application (16 caractères) : " password
+echo "entrez votre mot de passe d'application (16 caractères) : "
+read -s password
 
 # INSTALLATION DES DÉPENDANCES
 debconf-set-selections <<< "postfix postfix/mailname string your.hostname.com"
@@ -26,7 +27,7 @@ sudo systemctl restart postfix
 
 sudo cp warnSSH "/usr/local/bin/warnSSH"
 
-user=$(logname)
+# FICHIER SERVICE
 sudo cat > /etc/systemd/system/warnssh.service <<EOF
 [Unit]
 Description=Un outil pour notifier les connexions SSH en temps réel
@@ -36,10 +37,10 @@ ExecStart=/usr/local/bin/warnSSH
 Restart=always
 User=$user
 Environment=DISPLAY=:0
-Environment=HOME=/home/$user
+Environment=HOME=$HOME
 Environment=XDG_RUNTIME_DIR=/run/user/1000
 Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
-Environment=XAUTHORITY=/home/$user/.Xauthority
+Environment=XAUTHORITY=$HOME/.Xauthority
 
 [Install]
 WantedBy=multi-user.target
@@ -48,7 +49,8 @@ EOF
 echo "[smtp.gmail.com]:587 $email:$password" > /etc/postfix/sasl_passwd
 chmod 600 /etc/postfix/sasl_passwd
 
-sed -i 41d /etc/postfix/main.cf
+# MODIF FICHIER DE CONF POSTFIX
+sed -i /^relayhost/d /etc/postfix/main.cf
 echo "relayhost = [smtp.gmail.com]:587" >> /etc/postfix/main.cf
 echo "smtp_use_tls = yes" >> /etc/postfix/main.cf
 echo "smtp_sasl_auth_enable = yes" >> /etc/postfix/main.cf
