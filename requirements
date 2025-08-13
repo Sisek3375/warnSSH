@@ -50,11 +50,11 @@ chmod 600 /etc/postfix/sasl_passwd
 
 echo "relayhost = [smtp.gmail.com]:587" >> /etc/postfix/main.cf
 echo "smtp_use_tls = yes" >> /etc/postfix/main.cf
-smtp_sasl_auth_enable = yes >> /etc/postfix/main.cf
+echo "smtp_sasl_auth_enable = yes" >> /etc/postfix/main.cf
 echo "smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd" >> /etc/postfix/main.cf
 echo "smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt" >> /etc/postfix/main.cf
 
-postmap /etc/postfix/sasl/sasl_passwd
+postmap /etc/postfix/sasl_passwd
 
 systemctl daemon-reload
 systemctl enable warnssh.service
