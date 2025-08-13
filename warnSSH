@@ -84,11 +84,6 @@ tail -f -n 0 /var/log/auth.log | while read line; do
             echo "$(date "+%d/%m/%Y %H:%M:%S") | Déconnexion SSH" >> $log_file
             echo -e "Une déconnexion SSH a été détéctée. Voici ces informations :\n$base_info" | mail -s "WarnSSH - Déconnexion SSH détéctée 🔒" $email
 	    ;;
-        *"pam_unix(sshd:auth): authentication failure"*)
-            notify-send "🔐 Échec d'authentification PAM" "$base_info\n📋 Statut: Authentification PAM échouée"
-            echo "$(date "+%d/%m/%Y %H:%M:%S") | Échec d'authentification PAM" >> $log_file
-            echo -e "Échec d'authentification PAM. Voici ces informations :\n$base_info" | mail -s "WarnSSH - Échec d'authentification PAM 🔐" $email
-	    ;;
     esac
   fi
 done
