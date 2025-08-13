@@ -17,7 +17,7 @@ echo "export email=$email" >> /home/$user/.warnssh_env
 
 echo "entrez votre mot de passe d'application (16 caractères) : "
 read -s password
-echo "$GREEN[INFO] $NCInstallation en cours..."
+echo -e "$GREEN [INFO]$NC Installation en cours..."
 
 # INSTALLATION DES DÉPENDANCES
 debconf-set-selections <<< "postfix postfix/mailname string your.hostname.com"
