@@ -8,8 +8,8 @@ WarnSSH can notify you by just a pop-up in the server, but also by email using P
 
 ## INSTALLATION
 To install this tool, you just need to do this commands :  
-```chmod +x requirements```  
-```sudo ./requirements```  
+```chmod +x install```  
+```sudo ./install```  
 
 For Postfix, you have to insert your address mail and app password that you have to generated before, you can check this :  
 https://support.google.com/mail/answer/185833?hl=en
